@@ -5,6 +5,12 @@
     <string name="title_activity_creditos">Créditos</string>
     <string name="title_activity_busca">Salvador</string>
 
+    <string name="text_activity_creditos">Aplicativo desenvolvido por:</string>
+    <string name="dev1">Alan Atta</string>
+    <string name="dev2">Lucas Almeida</string>
+    <string name="dev3">Marcos Ricardo</string>
+    <string name="dev4">Mateus Barreto</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
