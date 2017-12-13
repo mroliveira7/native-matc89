@@ -1,18 +1,20 @@
 package com.mateus.tripadvisorapi;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
+import android.widget.TextView;
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistoricoActivity extends AppCompatActivity {
+public class BuscaActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayAdapter<String> listAdapter;
     private LocalizacaoAdapter adapter;
@@ -25,16 +27,8 @@ public class HistoricoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_historico);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-
-        listView = (ListView)findViewById(R.id.listView3);
+        setContentView(R.layout.activity_busca);
+        listView = (ListView)findViewById(R.id.listView);
         adapter = new LocalizacaoAdapter(this, 0, itens);
         listView.setAdapter(adapter);
         // listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -48,15 +42,5 @@ public class HistoricoActivity extends AppCompatActivity {
                 //  Toast.makeText(RoomActivity.this, "Clicou em" + nomeItem, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

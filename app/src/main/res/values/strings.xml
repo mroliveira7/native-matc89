@@ -1,9 +1,12 @@
 <resources>
-    <string name="app_name">TripAdvisorAPI</string>
+    <string name="app_name">Yelp API</string>
+    <string name="title_activity_favoritos">Favoritos</string>
+    <string name="title_activity_historico">Histórico</string>
+    <string name="title_activity_creditos">Créditos</string>
+    <string name="title_activity_busca">Salvador</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="title_activity_favoritos2">Favoritos2Activity</string>
 
     <string name="API_KEY">L3PFu3mJdn9iUyiW1mVm36shVCZwdeQx8lyMme6xzMY-CltrFf-joJbj2nK55BRaWA5-tTlVV1jrzXU50vTkHiWaG5KMLBkFyccXsQy2MswrGllwck9_2s34MZUtWnYx</string>
 </resources>

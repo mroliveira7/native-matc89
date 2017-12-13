@@ -20,15 +20,16 @@
             android:layout_alignLeft="@+id/gpsButton"
             android:layout_alignStart="@+id/gpsButton"
             android:layout_marginBottom="21dp"
-            android:text="AutoCompleteTextView"
+            android:hint="Digite uma Cidade..."
             android:textAlignment="center"
+            android:textColorHint="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteY="60dp" />
 
         <Button
             android:id="@+id/gpsButton"
-            style="@style/Widget.AppCompat.Button"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="305dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
