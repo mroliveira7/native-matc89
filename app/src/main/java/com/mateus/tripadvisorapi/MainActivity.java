@@ -1,6 +1,7 @@
 package com.mateus.tripadvisorapi;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,7 +24,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -53,6 +57,22 @@ public class MainActivity extends AppCompatActivity
 
         gpsButton = (Button) findViewById(R.id.gpsButton);
         gpsButton.setOnClickListener(gpsButtonClickListener);
+
+        AutoCompleteTextView autocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete);
+        autocomplete.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_list_item));
+
+        autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            String description = (String) adapterView.getItemAtPosition(position);
+            Toast.makeText(MainActivity.this, description, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        String[] params = {"autocomplete?text=del"};
+        GetREST getREST = new GetREST();
+        getREST.execute(params);
+
     }
 
     @Override
@@ -114,6 +134,8 @@ public class MainActivity extends AppCompatActivity
             enableLocation();
         }
     };
+
+
 
     private void enableLocation () {
         if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){

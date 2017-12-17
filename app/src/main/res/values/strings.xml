@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Yelp API</string>
+    <string name="app_name">Yelp for Android</string>
     <string name="title_activity_favoritos">Favoritos</string>
     <string name="title_activity_historico">Histórico</string>
     <string name="title_activity_creditos">Créditos</string>
