@@ -1,14 +1,11 @@
 package com.mateus.tripadvisorapi;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -24,7 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class BuscaActivity extends AppCompatActivity {
+public class DetalhesActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayAdapter<String> listAdapter;
     private LocalizacaoAdapter adapter;
@@ -35,13 +32,14 @@ public class BuscaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_busca);
+        setContentView(R.layout.activity_detalhes);
+
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String cityName = extras.getString(MainActivity.CITY_NAME);
 
-            ExecuteSearch executeSearch = new ExecuteSearch();
+            DetalhesActivity.ExecuteSearch executeSearch = new DetalhesActivity.ExecuteSearch();
             executeSearch.execute(cityName);
         }
 
@@ -59,9 +57,7 @@ public class BuscaActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
                 //String nomeItem = (String)listView.getItemAtPosition(i);
-                 Intent intent = new Intent(BuscaActivity.this, DetalhesActivity.class);
-                 // Passar dados do local para renderizar na prox pagina
-                 startActivity(intent);
+                // Intent intent = new Intent(RoomActivity.this, HomeActivity.class);
                 //String nomeItem = (String)listView.getItemAtPosition(i);
                 //  Toast.makeText(RoomActivity.this, "Clicou em" + nomeItem, Toast.LENGTH_SHORT).show();
             }
@@ -78,7 +74,7 @@ public class BuscaActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ExecuteSearch extends AsyncTask <String, Void, String> {
+    private class ExecuteSearch extends AsyncTask<String, Void, String> {
 
         private String baseUrl = "https://api.yelp.com/v3/businesses/search?";
         private String locationParam = "&location=";
@@ -161,18 +157,7 @@ public class BuscaActivity extends AppCompatActivity {
 
             adapter = new LocalizacaoAdapter(getApplicationContext(), 0, itens);
             listView.setAdapter(adapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
-                    //String nomeItem = (String)listView.getItemAtPosition(i);
-                    Intent intent = new Intent(BuscaActivity.this, DetalhesActivity.class);
-                    // Passar dados do local para renderizar na prox pagina
-                    startActivity(intent);
-                    //String nomeItem = (String)listView.getItemAtPosition(i);
-                    //  Toast.makeText(RoomActivity.this, "Clicou em" + nomeItem, Toast.LENGTH_SHORT).show();
-                }
-            });
         }
     }
 }
+

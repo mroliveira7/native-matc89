@@ -3,7 +3,7 @@
     package="com.mateus.tripadvisorapi">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -35,11 +35,13 @@
             android:label="@string/title_activity_creditos" />
         <activity
             android:name=".BuscaActivity"
-            android:label="@string/title_activity_busca"></activity>
+            android:label="@string/title_activity_busca" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB4PdmvKuqwuB52UxJD9z3_4LIQ_evsQhY"/>
+            android:value="AIzaSyB4PdmvKuqwuB52UxJD9z3_4LIQ_evsQhY" />
 
+        <activity android:name=".DetalhesActivity"></activity>
     </application>
 
 </manifest>
