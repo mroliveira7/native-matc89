@@ -142,12 +142,13 @@ public class BuscaActivity extends AppCompatActivity {
                         title = obj.getString("name");
 
                         JSONObject a = obj.getJSONObject("location");
-                        address = a.getString("display_address");
+                        JSONArray addressArray = a.getJSONArray("display_address");
+                        address = addressArray.get(0).toString();
 
                         rating =    obj.has("rating") ? obj.getLong("rating") : 0;
                         price =     obj.has("price") ? obj.getString("price") : " ";
                         phone =     obj.has("display_phone") ? obj.getString("display_phone") : "";
-                        img_url =   obj.has("img_url") ? obj.getString("image_url") : "";
+                        img_url =   obj.has("image_url") ? obj.getString("image_url") : null;
                         url = obj.getString("url");
 
                         itens.add(new Localizacao(id, title, address, rating, price, phone, img_url, url));

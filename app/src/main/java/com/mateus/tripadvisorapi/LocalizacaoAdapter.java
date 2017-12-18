@@ -2,12 +2,21 @@ package com.mateus.tripadvisorapi;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -26,6 +35,7 @@ public class LocalizacaoAdapter extends ArrayAdapter<Localizacao> {
         public TextView evaluation; // duration
         public TextView value; // duration
         public TextView phone; // duration
+        public ImageView image;
     }
 
     public LocalizacaoAdapter(Context context, int resource, ArrayList<Localizacao> objects) {
@@ -68,6 +78,7 @@ public class LocalizacaoAdapter extends ArrayAdapter<Localizacao> {
             viewHolder.evaluation = (TextView) convertView.findViewById(R.id.itemAvaliacao);
             viewHolder.value = (TextView) convertView.findViewById(R.id.itemValor);
             viewHolder.phone = (TextView) convertView.findViewById(R.id.itemTelefone);
+            viewHolder.image = (ImageView) convertView.findViewById(R.id.imageView);
 
             convertView.setTag(viewHolder);
         } else {
@@ -81,10 +92,51 @@ public class LocalizacaoAdapter extends ArrayAdapter<Localizacao> {
         viewHolder.evaluation.setText(Float.toString(dataModel.getRating()));
         viewHolder.value.setText(dataModel.getPrice());
         viewHolder.phone.setText(dataModel.getPhone());
+        if (viewHolder.image != null) {
+            new GetImageTask(viewHolder.image).execute(dataModel.getImg_url());
+        }
+//        viewHolder.image.setImageBitmap(GetImage.execute());
 
         /*viewHolder.value.setOnClickListener(this);
         viewHolder.info.setTag(position);
         */// Return the completed view to render on screen
         return convertView;
+    }
+
+    private class GetImageTask extends AsyncTask<String, Void, Bitmap> {
+        private final WeakReference<ImageView> imageViewReference;
+
+        public GetImageTask(ImageView imageView) {
+            imageViewReference = new WeakReference<ImageView>(imageView);
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL url = new URL(strings[0]);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.connect();
+
+                return BitmapFactory.decodeStream(conn.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+                cancel(true);
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            super.onPostExecute(result);
+            ImageView imageView = imageViewReference.get();
+
+            if (imageView != null) {
+                if (result != null) {
+                    imageView.setImageBitmap(result);
+                } else {
+                    imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_restaurant));
+                }
+            }
+        }
     }
 }
