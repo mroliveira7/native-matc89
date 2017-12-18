@@ -37,8 +37,6 @@ public class BuscaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_busca);
 
-
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String cityName = extras.getString(MainActivity.CITY_NAME);
@@ -54,20 +52,6 @@ public class BuscaActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-
-        // listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        //@Override
-        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
-                //String nomeItem = (String)listView.getItemAtPosition(i);
-                 Intent intent = new Intent(BuscaActivity.this, DetalhesActivity.class);
-                 // Passar dados do local para renderizar na prox pagina
-                 startActivity(intent);
-                //String nomeItem = (String)listView.getItemAtPosition(i);
-                //  Toast.makeText(RoomActivity.this, "Clicou em" + nomeItem, Toast.LENGTH_SHORT).show();
-            }
-        });*/
     }
 
     @Override
@@ -125,7 +109,7 @@ public class BuscaActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            ArrayList<Localizacao> itens = new ArrayList<>();
+            final ArrayList<Localizacao> itens = new ArrayList<>();
 
             if(result != null) {
                 String id, title, address, price, phone, img_url, url;
@@ -160,20 +144,20 @@ public class BuscaActivity extends AppCompatActivity {
                 }
             }
 
-            listView = (ListView)findViewById(R.id.listView7);
+            listView = (ListView)findViewById(R.id.listViewBusca);
 
             adapter = new LocalizacaoAdapter(getApplicationContext(), 0, itens);
             listView.setAdapter(adapter);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
-                    //String nomeItem = (String)listView.getItemAtPosition(i);
+                public void onItemClick(AdapterView<?> adapter, View view, int pos, long l) {
+                    Localizacao local = itens.get(pos);
                     Intent intent = new Intent(BuscaActivity.this, DetalhesActivity.class);
-                    // Passar dados do local para renderizar na prox pagina
+                    intent.putExtra("LOCAL", local);
+
                     startActivity(intent);
-                    //String nomeItem = (String)listView.getItemAtPosition(i);
-                    //  Toast.makeText(RoomActivity.this, "Clicou em" + nomeItem, Toast.LENGTH_SHORT).show();
+
                 }
             });
         }

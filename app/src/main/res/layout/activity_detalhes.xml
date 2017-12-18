@@ -25,7 +25,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <RatingBar
-        android:id="@+id/ratingBar"
+        android:id="@+id/ratingBarDetalhes"
         android:layout_width="237dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -35,12 +35,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintStart_toEndOf="@+id/imageViewDetalhes"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/textViewDetalhesTitle"
         android:layout_width="222dp"
         android:layout_height="47dp"
         android:layout_marginBottom="8dp"
@@ -58,7 +58,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imageViewDetalhes"
         android:layout_width="100dp"
         android:layout_height="98dp"
         android:layout_marginBottom="8dp"
@@ -84,11 +84,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.031"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewDetalhes"
         app:layout_constraintVertical_bias="0.048" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/textViewDetalhesDescricao"
         android:layout_width="360dp"
         android:layout_height="85dp"
         android:layout_marginBottom="8dp"
@@ -133,7 +133,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDetalhesDescricao"
         app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

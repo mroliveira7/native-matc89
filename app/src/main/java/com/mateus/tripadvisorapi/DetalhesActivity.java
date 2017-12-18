@@ -1,67 +1,59 @@
 package com.mateus.tripadvisorapi;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class DetalhesActivity extends AppCompatActivity {
-    private ListView listView;
-    private ArrayAdapter<String> listAdapter;
-    private LocalizacaoAdapter adapter;
-    private ArrayList<Localizacao> itens;
+    private Localizacao localizacao;
 
-    private List<Localizacao> grupos = new ArrayList<Localizacao>();
+    private TextView titulo;
+    private TextView descricao;
+    private ImageView image;
+    private RatingBar ratingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhes);
 
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            String cityName = extras.getString(MainActivity.CITY_NAME);
-
-            DetalhesActivity.ExecuteSearch executeSearch = new DetalhesActivity.ExecuteSearch();
-            executeSearch.execute(cityName);
-        }
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Bundle extras = getIntent().getExtras();
+
+        if (extras != null) {
+            localizacao = (Localizacao) extras.getParcelable("LOCAL");
+
+            titulo = (TextView) findViewById(R.id.textViewDetalhesTitle);
+            descricao = (TextView) findViewById(R.id.textViewDetalhesDescricao);
+            image = (ImageView) findViewById(R.id.imageViewDetalhes);
+            ratingBar = (RatingBar) findViewById(R.id.ratingBarDetalhes);
+
+            titulo.setText(localizacao.getTitle());
+            descricao.setText(localizacao.getAddress());
+            ratingBar.setRating(localizacao.getRating());
+
+            new GetImageTask(image).execute(localizacao.getImg_url());
+        }
 
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-
-        // listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        //@Override
-        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
-                //String nomeItem = (String)listView.getItemAtPosition(i);
-                // Intent intent = new Intent(RoomActivity.this, HomeActivity.class);
-                //String nomeItem = (String)listView.getItemAtPosition(i);
-                //  Toast.makeText(RoomActivity.this, "Clicou em" + nomeItem, Toast.LENGTH_SHORT).show();
-            }
-        });*/
     }
 
     @Override
@@ -74,89 +66,40 @@ public class DetalhesActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ExecuteSearch extends AsyncTask<String, Void, String> {
+    private class GetImageTask extends AsyncTask<String, Void, Bitmap> {
+        private final WeakReference<ImageView> imageViewReference;
 
-        private String baseUrl = "https://api.yelp.com/v3/businesses/search?";
-        private String locationParam = "&location=";
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        public GetImageTask(ImageView imageView) {
+            imageViewReference = new WeakReference<ImageView>(imageView);
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            String cityName = strings[0], url;
-
-            if (cityName.indexOf("-") != -1) {
-                cityName = cityName.substring(0, cityName.indexOf("-"));
-            }
-
-            if (cityName.indexOf(",") != -1) {
-                cityName = cityName.substring(0, cityName.indexOf(","));
-            }
-
-            url = baseUrl.concat(locationParam).concat(cityName);
-
+        protected Bitmap doInBackground(String... strings) {
             try {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .header("Authorization", "Bearer " + getResources().getString(R.string.API_KEY))
-                        .url(url)
-                        .build();
+                URL url = new URL(strings[0]);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.connect();
 
-                Response response = client.newCall(request).execute();
-
-                return response.body().string();
+                return BitmapFactory.decodeStream(conn.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
+                cancel(true);
             }
 
             return null;
         }
 
-        @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
+            ImageView imageView = imageViewReference.get();
 
-            ArrayList<Localizacao> itens = new ArrayList<>();
-
-            if(result != null) {
-                String id, title, address, price, phone, img_url, url;
-                float rating;
-
-                try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    JSONArray jsonArray = jsonObject.getJSONArray("businesses");
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-
-                        id = obj.getString("id");
-                        title = obj.getString("name");
-
-                        JSONObject a = obj.getJSONObject("location");
-                        address = a.getString("display_address");
-
-                        rating =    obj.has("rating") ? obj.getLong("rating") : 0;
-                        price =     obj.has("price") ? obj.getString("price") : " ";
-                        phone =     obj.has("display_phone") ? obj.getString("display_phone") : "";
-                        img_url =   obj.has("img_url") ? obj.getString("image_url") : "";
-                        url = obj.getString("url");
-
-                        itens.add(new Localizacao(id, title, address, rating, price, phone, img_url, url));
-                    }
-
-                    Log.i("LENGTH", Integer.toString(itens.size()));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            if (imageView != null) {
+                if (result != null) {
+                    image.setImageBitmap(result);
+                } else {
+                    image.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_restaurant));
                 }
             }
-
-            listView = (ListView)findViewById(R.id.listView7);
-
-            adapter = new LocalizacaoAdapter(getApplicationContext(), 0, itens);
-            listView.setAdapter(adapter);
         }
     }
 }

@@ -1,14 +1,17 @@
 package com.mateus.tripadvisorapi;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Lucas on 13/12/2017.
  */
 
-public class Localizacao {
+public class Localizacao implements Parcelable {
     private String id;
     private String title;
     private String address;
-    private float rating;  // TEM QUE SER INT, TA STRING SO PRA TESTE
+    private float rating;
     private String price;
     private String phone;
     private String img_url;
@@ -24,6 +27,29 @@ public class Localizacao {
         this.img_url = img_url;
         this.url = url;
     }
+
+    protected Localizacao(Parcel in) {
+        id = in.readString();
+        title = in.readString();
+        address = in.readString();
+        rating = in.readFloat();
+        price = in.readString();
+        phone = in.readString();
+        img_url = in.readString();
+        url = in.readString();
+    }
+
+    public static final Creator<Localizacao> CREATOR = new Creator<Localizacao>() {
+        @Override
+        public Localizacao createFromParcel(Parcel in) {
+            return new Localizacao(in);
+        }
+
+        @Override
+        public Localizacao[] newArray(int size) {
+            return new Localizacao[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -87,5 +113,22 @@ public class Localizacao {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(title);
+        parcel.writeString(address);
+        parcel.writeFloat(rating);
+        parcel.writeString(price);
+        parcel.writeString(phone);
+        parcel.writeString(img_url);
+        parcel.writeString(url);
     }
 }
