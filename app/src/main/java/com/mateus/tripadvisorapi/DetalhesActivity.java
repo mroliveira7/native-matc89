@@ -20,7 +20,7 @@ import java.net.URL;
 public class DetalhesActivity extends AppCompatActivity {
     private Localizacao localizacao;
 
-    private TextView titulo;
+    private TextView endereco;
     private TextView descricao;
     private ImageView image;
     private RatingBar ratingBar;
@@ -38,13 +38,14 @@ public class DetalhesActivity extends AppCompatActivity {
         if (extras != null) {
             localizacao = (Localizacao) extras.getParcelable("LOCAL");
 
-            titulo = (TextView) findViewById(R.id.textViewDetalhesTitle);
+            endereco = (TextView) findViewById(R.id.textViewDetalhesAddress);
             descricao = (TextView) findViewById(R.id.textViewDetalhesDescricao);
             image = (ImageView) findViewById(R.id.imageViewDetalhes);
             ratingBar = (RatingBar) findViewById(R.id.ratingBarDetalhes);
 
-            titulo.setText(localizacao.getTitle());
-            descricao.setText(localizacao.getAddress());
+            setTitle(localizacao.getTitle());
+            endereco.setText(localizacao.getAddress());
+            descricao.setText(localizacao.getPhone());
             ratingBar.setRating(localizacao.getRating());
 
             new GetImageTask(image).execute(localizacao.getImg_url());
