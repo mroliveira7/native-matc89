@@ -1,8 +1,6 @@
 package com.mateus.tripadvisorapi;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,31 +8,28 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LocationManager locationManager;
-    private LocationListener locationListener;
     private Button gpsButton;
+
+    public static final String CITY_NAME = "CITY_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,25 +48,18 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationListener = locListener;
 
         gpsButton = (Button) findViewById(R.id.gpsButton);
         gpsButton.setOnClickListener(gpsButtonClickListener);
 
         AutoCompleteTextView autocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete);
+
         autocomplete.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_list_item));
+        autocomplete.setOnItemClickListener(cityClickListerner);
 
-        autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            String description = (String) adapterView.getItemAtPosition(position);
-            Toast.makeText(MainActivity.this, description, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        String[] params = {"autocomplete?text=del"};
+        /*String[] params = {"autocomplete?text=del"};
         GetREST getREST = new GetREST();
-        getREST.execute(params);
+        getREST.execute(params);*/
 
     }
 
@@ -102,7 +90,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -128,14 +115,25 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private AdapterView.OnItemClickListener cityClickListerner = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            String cityName = (String) adapterView.getItemAtPosition(position);
+
+            Intent intent;
+            intent = new Intent(getApplicationContext(), BuscaActivity.class);
+            intent.putExtra(MainActivity.CITY_NAME, cityName);
+
+            startActivity(intent);
+        }
+    };
+
     private View.OnClickListener gpsButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             enableLocation();
         }
     };
-
-
 
     private void enableLocation () {
         if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
@@ -144,7 +142,7 @@ public class MainActivity extends AppCompatActivity
             return;
         } else {
             Log.i("DEBUG", "PERMISSIONS GRANTED");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locationListener);
         }
     }
 
@@ -159,7 +157,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private LocationListener  locListener = new LocationListener() {
+    private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             Log.i("LOCATION", location.getLatitude() + " " + location.getLongitude());

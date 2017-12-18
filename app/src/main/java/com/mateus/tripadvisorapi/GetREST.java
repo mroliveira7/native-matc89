@@ -21,6 +21,11 @@ public class GetREST extends AsyncTask<String, Boolean, Integer> {
     private int status;
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
     protected Integer doInBackground(String... params) {
         HttpURLConnection con = null;
         InputStream is = null;
@@ -38,7 +43,6 @@ public class GetREST extends AsyncTask<String, Boolean, Integer> {
                 url = url.concat(params[i]);
             }
         }
-
 
         try {
             con = (HttpURLConnection) (new URL(url)).openConnection();
@@ -76,11 +80,6 @@ public class GetREST extends AsyncTask<String, Boolean, Integer> {
             e.printStackTrace();
         }
         return 1;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
     }
 
     @Override
