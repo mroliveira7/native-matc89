@@ -37,10 +37,12 @@ public class BuscaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_busca);
 
+
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String cityName = extras.getString(MainActivity.CITY_NAME);
-
+            setTitle(cityName);
             ExecuteSearch executeSearch = new ExecuteSearch();
             executeSearch.execute(cityName);
         }
