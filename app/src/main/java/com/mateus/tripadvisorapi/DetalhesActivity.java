@@ -47,6 +47,8 @@ public class DetalhesActivity extends AppCompatActivity {
             endereco.setText(localizacao.getAddress());
             descricao.setText(localizacao.getPhone());
             ratingBar.setRating(localizacao.getRating());
+            ratingBar.setIsIndicator(true);
+            
 
             new GetImageTask(image).execute(localizacao.getImg_url());
         }
