@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,7 +129,7 @@ public class BuscaActivity extends AppCompatActivity {
                         JSONArray addressArray = a.getJSONArray("display_address");
                         address = addressArray.get(0).toString();
 
-                        rating =    obj.has("rating") ? obj.getLong("rating") : 0;
+                        rating =    obj.has("rating") ? BigDecimal.valueOf(obj.getDouble("rating")).floatValue() : 0;
                         price =     obj.has("price") ? obj.getString("price") : " ";
                         phone =     obj.has("display_phone") ? obj.getString("display_phone") : "";
                         img_url =   obj.has("image_url") ? obj.getString("image_url") : null;
@@ -137,8 +137,6 @@ public class BuscaActivity extends AppCompatActivity {
 
                         itens.add(new Localizacao(id, title, address, rating, price, phone, img_url, url));
                     }
-
-                    Log.i("LENGTH", Integer.toString(itens.size()));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -4,13 +4,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -20,10 +23,14 @@ import java.net.URL;
 public class DetalhesActivity extends AppCompatActivity {
     private Localizacao localizacao;
 
+    private TextView titulo;
     private TextView endereco;
-    private TextView descricao;
     private ImageView image;
     private RatingBar ratingBar;
+    private TextView price;
+    private TextView phone;
+
+    private FloatingActionButton favorito;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,20 +45,25 @@ public class DetalhesActivity extends AppCompatActivity {
         if (extras != null) {
             localizacao = (Localizacao) extras.getParcelable("LOCAL");
 
-            endereco = (TextView) findViewById(R.id.textViewDetalhesAddress);
-            descricao = (TextView) findViewById(R.id.textViewDetalhesDescricao);
+            titulo = (TextView) findViewById(R.id.textViewDetalhesTitle);
+            endereco = (TextView) findViewById(R.id.textViewDetalhesEndereco);
             image = (ImageView) findViewById(R.id.imageViewDetalhes);
             ratingBar = (RatingBar) findViewById(R.id.ratingBarDetalhes);
+            price = (TextView) findViewById(R.id.textViewDetalhesPrice);
+            phone = (TextView) findViewById(R.id.textViewDetalhesPhone);
 
-            setTitle(localizacao.getTitle());
+            titulo.setText(localizacao.getTitle());
             endereco.setText(localizacao.getAddress());
-            descricao.setText(localizacao.getPhone());
             ratingBar.setRating(localizacao.getRating());
-            ratingBar.setIsIndicator(true);
-            
+            price.setText(localizacao.getPrice());
+            phone.setText(localizacao.getPhone());
 
             new GetImageTask(image).execute(localizacao.getImg_url());
         }
+
+
+        favorito = (FloatingActionButton) findViewById(R.id.favoritoButton);
+        favorito.setOnClickListener(favoritarListener);
 
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -68,6 +80,13 @@ public class DetalhesActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private View.OnClickListener favoritarListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Toast.makeText(getApplicationContext(), "Adicionado aos favoritos", Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private class GetImageTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewReference;

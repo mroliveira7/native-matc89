@@ -28,13 +28,12 @@ public class LocalizacaoAdapter extends ArrayAdapter<Localizacao> {
     private ArrayList<Localizacao> dataSet;
     Context mContext;
 
-    // View lookup cache
     static class ViewHolder {
-        public TextView title; // title
-        public TextView address; // artist name
-        public TextView evaluation; // duration
-        public TextView value; // duration
-        public TextView phone; // duration
+        public TextView title;
+        public TextView address;
+        public TextView evaluation;
+        public TextView value;
+        public TextView phone;
         public ImageView image;
     }
 
@@ -44,22 +43,6 @@ public class LocalizacaoAdapter extends ArrayAdapter<Localizacao> {
         this.mContext=context;
 
     }
-
-    /*@Override
-    public void onClick(View v) {
-
-        int position=(Integer) v.getTag();
-        Object object= getItem(position);
-        DataModel dataModel=(DataModel)object;
-
-        switch (v.getId())
-        {
-            case R.id.item_info:
-                Snackbar.make(v, "Release date " +dataModel.getFeature(), Snackbar.LENGTH_LONG)
-                        .setAction("No action", null).show();
-                break;
-        }
-    }*/
 
     private int lastPosition = -1;
 
@@ -89,17 +72,13 @@ public class LocalizacaoAdapter extends ArrayAdapter<Localizacao> {
 
         viewHolder.title.setText(dataModel.getTitle());
         viewHolder.address.setText(dataModel.getAddress());
-        viewHolder.evaluation.setText(Float.toString(dataModel.getRating()));
+        viewHolder.evaluation.setText(String.format("%.1f", dataModel.getRating()));
         viewHolder.value.setText(dataModel.getPrice());
         viewHolder.phone.setText(dataModel.getPhone());
         if (viewHolder.image != null) {
             new GetImageTask(viewHolder.image).execute(dataModel.getImg_url());
         }
-//        viewHolder.image.setImageBitmap(GetImage.execute());
 
-        /*viewHolder.value.setOnClickListener(this);
-        viewHolder.info.setTag(position);
-        */// Return the completed view to render on screen
         return convertView;
     }
 
