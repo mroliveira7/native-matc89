@@ -45,6 +45,8 @@ public class DetalhesActivity extends AppCompatActivity {
         if (extras != null) {
             localizacao = (Localizacao) extras.getParcelable("LOCAL");
 
+            setTitle(localizacao.getTitle());
+            
             titulo = (TextView) findViewById(R.id.textViewDetalhesTitle);
             endereco = (TextView) findViewById(R.id.textViewDetalhesEndereco);
             image = (ImageView) findViewById(R.id.imageViewDetalhes);
