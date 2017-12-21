@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Button gpsButton;
+    private AutoCompleteTextView autocomplete;
 
     public static final String CITY_NAME = "CITY_NAME";
     public static final String CITY_LAT = "CITY_LAT";
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity
         gpsButton = (Button) findViewById(R.id.gpsButton);
         gpsButton.setOnClickListener(gpsButtonClickListener);
 
-        AutoCompleteTextView autocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete);
+        autocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete);
 
         autocomplete.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_list_item));
         autocomplete.setOnItemClickListener(cityClickListerner);

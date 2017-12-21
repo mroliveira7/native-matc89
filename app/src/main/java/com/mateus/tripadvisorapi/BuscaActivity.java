@@ -51,9 +51,8 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse, A
 
         listView = (ListView)findViewById(R.id.listViewBusca);
         itens = new ArrayList<Localizacao>();
-        adapter = new LocalizacaoAdapter(this, 0, itens);
 
-        listView.setAdapter(adapter);
+        listView.setAdapter(new LocalizacaoAdapter(this, itens));
         listView.setOnScrollListener(this);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -162,8 +161,6 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse, A
 
                 itens.add(new Localizacao(id, title, address, rating, price, phone, img_url, url));
             }
-
-            this.adapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
