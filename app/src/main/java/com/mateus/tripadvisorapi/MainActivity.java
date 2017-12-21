@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity
 
     private View.OnClickListener gpsButtonClickListener = new View.OnClickListener() {
         private LocationManager locationManager;
+        private Location location;
 
         @Override
         public void onClick(View view) {
@@ -149,10 +150,27 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
 
-                locationManager.requestLocationUpdates(bestProvider, 1000, 1, locationListener);
+                if (locationManager.getLastKnownLocation(bestProvider) != null) {
+                    location = locationManager.getLastKnownLocation(bestProvider);
+                    startSearch();
+                } else {
+                    locationManager.requestLocationUpdates(bestProvider, 1000, 1, locationListener);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private void startSearch() {
+            String latitude = String.format("%f", this.location.getLatitude());
+            String longitude = String.format("%f", this.location.getLongitude());
+
+            Intent intent;
+            intent = new Intent(getApplicationContext(), BuscaActivity.class);
+            intent.putExtra(MainActivity.CITY_LAT, latitude);
+            intent.putExtra(MainActivity.CITY_LON, longitude);
+
+            startActivity(intent);
         }
 
         private LocationListener locationListener = new LocationListener() {
@@ -161,15 +179,7 @@ public class MainActivity extends AppCompatActivity
                 if (location.getAccuracy() <= 150) {
                     locationManager.removeUpdates(this);
 
-                    String latitude = String.format("%f", location.getLatitude());
-                    String longitude = String.format("%f", location.getLongitude());
-
-                    Intent intent;
-                    intent = new Intent(getApplicationContext(), BuscaActivity.class);
-                    intent.putExtra(MainActivity.CITY_LAT, latitude);
-                    intent.putExtra(MainActivity.CITY_LON, longitude);
-
-                    startActivity(intent);
+                    startSearch();
                 }
             }
 
