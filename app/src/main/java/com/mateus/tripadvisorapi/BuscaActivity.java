@@ -38,11 +38,9 @@ public class BuscaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_busca);
 
         Bundle extras = getIntent().getExtras();
+
         if (extras != null) {
-            String cityName = extras.getString(MainActivity.CITY_NAME);
-            setTitle(cityName);
-            ExecuteSearch executeSearch = new ExecuteSearch();
-            executeSearch.execute(cityName);
+            processExtras(extras);
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,19 +62,13 @@ public class BuscaActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ExecuteSearch extends AsyncTask <String, Void, String> {
+    private void processExtras (Bundle extras) {
+        String cityName = extras.getString(MainActivity.CITY_NAME);
+        String latitude = extras.getString(MainActivity.CITY_LAT);
+        String longitude = extras.getString(MainActivity.CITY_LON);
 
-        private String baseUrl = "https://api.yelp.com/v3/businesses/search?";
-        private String locationParam = "&location=";
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String cityName = strings[0], url;
+        if (cityName != null) {
+            setTitle(cityName);
 
             if (cityName.indexOf("-") != -1) {
                 cityName = cityName.substring(0, cityName.indexOf("-"));
@@ -86,7 +78,38 @@ public class BuscaActivity extends AppCompatActivity {
                 cityName = cityName.substring(0, cityName.indexOf(","));
             }
 
-            url = baseUrl.concat(locationParam).concat(cityName);
+            ExecuteSearch executeSearch = new ExecuteSearch();
+            executeSearch.execute(cityName);
+        } else {
+            latitude = latitude.replaceAll(",", ".");
+            longitude = longitude.replaceAll(",", ".");
+
+            ExecuteSearch executeSearch = new ExecuteSearch();
+            executeSearch.execute(latitude, longitude);
+        }
+    }
+
+    private class ExecuteSearch extends AsyncTask <String, Void, String> {
+
+        private String baseUrl = "https://api.yelp.com/v3/businesses/search?";
+        private String locationParam = "&location=";
+        private String latParam = "&latitude=";
+        private String lonParam = "&longitude=";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String url;
+
+            if (strings.length == 1) {
+                url = baseUrl.concat(locationParam).concat(strings[0]);
+            } else {
+                url = baseUrl.concat(latParam).concat(strings[0]).concat(lonParam).concat(strings[1]);
+            }
 
             try {
                 OkHttpClient client = new OkHttpClient();

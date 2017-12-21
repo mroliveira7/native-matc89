@@ -1,8 +1,8 @@
 package com.mateus.tripadvisorapi;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,21 +15,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private LocationManager locationManager;
     private Button gpsButton;
 
     public static final String CITY_NAME = "CITY_NAME";
+    public static final String CITY_LAT = "CITY_LAT";
+    public static final String CITY_LON = "CITY_LON";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
         gpsButton = (Button) findViewById(R.id.gpsButton);
         gpsButton.setOnClickListener(gpsButtonClickListener);
 
@@ -56,11 +55,6 @@ public class MainActivity extends AppCompatActivity
 
         autocomplete.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_list_item));
         autocomplete.setOnItemClickListener(cityClickListerner);
-
-        /*String[] params = {"autocomplete?text=del"};
-        GetREST getREST = new GetREST();
-        getREST.execute(params);*/
-
     }
 
     @Override
@@ -129,53 +123,64 @@ public class MainActivity extends AppCompatActivity
     };
 
     private View.OnClickListener gpsButtonClickListener = new View.OnClickListener() {
+        private LocationManager locationManager;
+
         @Override
         public void onClick(View view) {
-            enableLocation();
+            updateLocation();
         }
-    };
 
-    private void enableLocation () {
-        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
-            Log.i("DEBUG", "REQUEST PERMISSIONS");
-            return;
-        } else {
-            Log.i("DEBUG", "PERMISSIONS GRANTED");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locationListener);
-        }
-    }
+        private void updateLocation() {
+            if ( Build.VERSION.SDK_INT >= 23 &&
+                    ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 100){
-            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                enableLocation();
+                return;
+            }
+
+            try {
+                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+                Criteria criteria = new Criteria();
+                String bestProvider = locationManager.getBestProvider(criteria, false);
+
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    Toast.makeText(getApplicationContext(), "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show();
+
+                    return;
+                }
+
+                locationManager.requestLocationUpdates(bestProvider, 1000, 1, locationListener);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-    }
 
+        private LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (location.getAccuracy() <= 150) {
+                    locationManager.removeUpdates(this);
 
-    private LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.i("LOCATION", location.getLatitude() + " " + location.getLongitude());
-        }
+                    String latitude = String.format("%f", location.getLatitude());
+                    String longitude = String.format("%f", location.getLongitude());
 
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
+                    Intent intent;
+                    intent = new Intent(getApplicationContext(), BuscaActivity.class);
+                    intent.putExtra(MainActivity.CITY_LAT, latitude);
+                    intent.putExtra(MainActivity.CITY_LON, longitude);
 
-        }
+                    startActivity(intent);
+                }
+            }
 
-        @Override
-        public void onProviderEnabled(String s) {
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {}
 
-        }
+            @Override
+            public void onProviderEnabled(String s) {}
 
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
+            @Override
+            public void onProviderDisabled(String s) {}
+        };
     };
 }
