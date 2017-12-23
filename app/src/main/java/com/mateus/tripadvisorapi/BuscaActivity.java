@@ -153,14 +153,16 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 switch (scrollState) {
                     case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                        // SCROLL STOP
                         adapter.setSCROLL_STOP(true);
-                        Log.i("SCROLL", "STOPED");
                         handler.postDelayed(updateListView, 500);
+
                         break;
                     case AbsListView.OnScrollListener.SCROLL_STATE_FLING:
+                        // SCROLL SCROLLING
                         adapter.setSCROLL_STOP(false);
-                        Log.i("SCROLL", "SCROLLING");
                         handler.removeCallbacks(updateListView);
+
                         break;
                 }
             }
@@ -175,6 +177,9 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
         statusTextView.setVisibility(View.GONE);
     }
 
+    /**
+     * Atualiza o listview para carregar as imagens
+     */
     public Runnable updateListView = new Runnable() {
         @Override
         public void run() {
@@ -183,15 +188,14 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
             first = listView.getFirstVisiblePosition();
             last = listView.getLastVisiblePosition();
 
-            Log.i("LOG", String.format("FIRST: %d, LAST: %d", first, last));
 
             for (int i = first; i <= last; i++) {
                 final int dataPosition = i - listView.getHeaderViewsCount();
                 final int childPosition = i - listView.getFirstVisiblePosition();
 
-                if (dataPosition >= 0 && dataPosition < listView.getAdapter().getCount()
+                if (dataPosition >= 0
+                        && dataPosition < listView.getAdapter().getCount()
                         && listView.getChildAt(childPosition) != null) {
-                    Log.i("REFRESH", "Refreshing view (data=" + dataPosition + ",child=" + childPosition + ")");
                     listView.getAdapter().getView(i, listView.getChildAt(childPosition), listView);
                 }
             }

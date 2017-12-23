@@ -5,10 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -25,20 +26,24 @@ import java.util.ArrayList;
  */
 
 public class LocalizacaoAdapter extends BaseAdapter implements ListAdapter{
-
     private ArrayList<Localizacao> dataSet;
     private LayoutInflater layoutInflater;
-    private Bitmap[] imagesList;
+    private ArrayList<ImageInfo> imagesList;
+    private Context mContext;
 
     private boolean SCROLL_STOP = true;
 
+    public static final int MAX_IMAGES = 30;
+    private static int IMAGES_INDEX = 0;
+
     public LocalizacaoAdapter(Context context , ArrayList objects) {
+        mContext = context;
         dataSet = objects;
         layoutInflater = LayoutInflater.from(context);
-        imagesList = new Bitmap[dataSet.size()];
+        imagesList = new ArrayList<ImageInfo>(MAX_IMAGES);
 
-        for (int i = 0; i < dataSet.size(); i++) {
-            imagesList[i] = null;
+        for (int i = 0; i < MAX_IMAGES; i++) {
+            imagesList.add(i, new ImageInfo(null, -1));
         }
     }
 
@@ -102,36 +107,42 @@ public class LocalizacaoAdapter extends BaseAdapter implements ListAdapter{
         viewHolder.value.setText(localizacao.getPrice());
         viewHolder.phone.setText(localizacao.getPhone());
 
-        if (imagesList[position] != null) {
-            viewHolder.image.setImageBitmap(imagesList[position]);
-        } else {
-            Drawable defaultDrawable = viewHolder.image.getContext().getResources().getDrawable(R.drawable.ic_restaurant);
-            viewHolder.image.setImageDrawable(defaultDrawable);
-        }
+        if (viewHolder.image != null) {
+            int i;
+            boolean hasImage = false;
 
-        if (imagesList[position] == null && SCROLL_STOP) {
-            new GetImageTask(viewHolder.image, imagesList, position).execute(localizacao.getImg_url());
-        }
+            for (i = 0; i < imagesList.size(); i++) {
+                if (imagesList.get(i).getPos() == position) {
+                    viewHolder.image.setImageBitmap(imagesList.get(i).getImage());
+                    hasImage = true;
 
+                    break;
+                }
+            }
+
+            if (i == imagesList.size()) {
+                Drawable defaultDrawable = mContext.getResources().getDrawable(R.drawable.ic_restaurant);
+                viewHolder.image.setImageDrawable(defaultDrawable);
+            }
+
+            if (!hasImage && SCROLL_STOP) {
+                new GetImageTask(viewHolder.image, imagesList, position).execute(localizacao.getImg_url());
+            }
+
+        }
 
         return convertView;
     }
 
     private class GetImageTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewWeakReference;
-        private final WeakReference<Bitmap[]> imageListReference;
+        private final WeakReference<ArrayList<ImageInfo>> imageListReference;
         private int position;
 
-        public GetImageTask(ImageView imageView, Bitmap[] imageList, int pos) {
+        public GetImageTask(ImageView imageView, ArrayList<ImageInfo> imageList, int pos) {
             imageViewWeakReference = new WeakReference<ImageView>(imageView);
-            imageListReference = new WeakReference<Bitmap[]>(imageList);
+            imageListReference = new WeakReference<ArrayList<ImageInfo>>(imageList);
             position = pos;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.e("ASYNC", "CREATES ME");
         }
 
         @Override
@@ -153,12 +164,43 @@ public class LocalizacaoAdapter extends BaseAdapter implements ListAdapter{
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
             ImageView imageView = imageViewWeakReference.get();
-            Bitmap[] imageList = imageListReference.get();
+            ArrayList<ImageInfo> imageList = imageListReference.get();
 
             if (imageView != null && imageList != null && result != null) {
                 imageView.setImageBitmap(result);
-                imageList[position] = result;
+                imageList.set(IMAGES_INDEX, new ImageInfo(result, position));
+
+                IMAGES_INDEX = ((IMAGES_INDEX + 1) < MAX_IMAGES) ? IMAGES_INDEX + 1 : 0;
+
+                Animation fadeIn = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
+                imageView.startAnimation(fadeIn);
             }
+        }
+    }
+
+    public class ImageInfo {
+        private Bitmap image;
+        private int pos;
+
+        public ImageInfo(Bitmap image, int pos) {
+            this.image = image;
+            this.pos = pos;
+        }
+
+        public Bitmap getImage() {
+            return image;
+        }
+
+        public void setImage(Bitmap image) {
+            this.image = image;
+        }
+
+        public int getPos() {
+            return pos;
+        }
+
+        public void setPos(int pos) {
+            this.pos = pos;
         }
     }
 }
