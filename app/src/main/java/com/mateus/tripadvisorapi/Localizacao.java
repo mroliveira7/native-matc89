@@ -8,19 +8,25 @@ import android.os.Parcelable;
  */
 
 public class Localizacao implements Parcelable {
-    private String id;
+    private String id_location;
     private String title;
     private String address;
+    private String city;
+    private float lat;
+    private float lon;
     private float rating;
     private String price;
     private String phone;
     private String img_url;
     private String url;
 
-    public Localizacao(String id, String title, String address, float rating, String price, String phone, String img_url, String url) {
-        this.id = id;
+    public Localizacao(String id_location, String title, String address, String city, float lat, float lon, float rating, String price, String phone, String img_url, String url) {
+        this.id_location = id_location;
         this.title = title;
         this.address = address;
+        this.city = city;
+        this.lat = lat;
+        this.lon = lon;
         this.rating = rating;
         this.price = price;
         this.phone = phone;
@@ -28,10 +34,17 @@ public class Localizacao implements Parcelable {
         this.url = url;
     }
 
+    public Localizacao () {
+
+    }
+
     protected Localizacao(Parcel in) {
-        id = in.readString();
+        id_location = in.readString();
         title = in.readString();
         address = in.readString();
+        city = in.readString();
+        lat = in.readFloat();
+        lon = in.readFloat();
         rating = in.readFloat();
         price = in.readString();
         phone = in.readString();
@@ -51,12 +64,12 @@ public class Localizacao implements Parcelable {
         }
     };
 
-    public String getId() {
-        return id;
+    public String getId_location() {
+        return id_location;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId_location(String id_location) {
+        this.id_location = id_location;
     }
 
     public String getTitle() {
@@ -73,6 +86,30 @@ public class Localizacao implements Parcelable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public float getLat() {
+        return lat;
+    }
+
+    public void setLat(float lat) {
+        this.lat = lat;
+    }
+
+    public float getLon() {
+        return lon;
+    }
+
+    public void setLon(float lon) {
+        this.lon = lon;
     }
 
     public float getRating() {
@@ -122,9 +159,12 @@ public class Localizacao implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(id);
+        parcel.writeString(id_location);
         parcel.writeString(title);
         parcel.writeString(address);
+        parcel.writeString(city);
+        parcel.writeFloat(lat);
+        parcel.writeFloat(lon);
         parcel.writeFloat(rating);
         parcel.writeString(price);
         parcel.writeString(phone);

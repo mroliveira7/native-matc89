@@ -29,4 +29,5 @@ dependencies {
     implementation files('libs/okhttp-3.9.1.jar')
     implementation files('libs/okio-1.13.0.jar')
     compile 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'com.google.android.gms:play-services-maps:11.6.2'
 }

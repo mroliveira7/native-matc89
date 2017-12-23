@@ -2,7 +2,9 @@ package com.mateus.tripadvisorapi;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,15 +26,20 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private Button gpsButton;
     private AutoCompleteTextView autocomplete;
 
+    private LocationManager locationManager;
+    private Location location;
+
     public static final String CITY_NAME = "CITY_NAME";
-    public static final String CITY_LAT = "CITY_LAT";
-    public static final String CITY_LON = "CITY_LON";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         gpsButton = (Button) findViewById(R.id.gpsButton);
-        gpsButton.setOnClickListener(gpsButtonClickListener);
+        gpsButton.setOnClickListener(this);
 
         autocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete);
 
@@ -110,6 +118,94 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void startSearchCity (String city) {
+        Intent intent;
+        intent = new Intent(getApplicationContext(), BuscaActivity.class);
+        intent.putExtra(MainActivity.CITY_NAME, city);
+
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.gpsButton:
+                updateLocation();
+                break;
+        }
+    }
+
+    private void updateLocation() {
+        if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+
+        try {
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+            Criteria criteria = new Criteria();
+            String bestProvider = locationManager.getBestProvider(criteria, false);
+
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Toast.makeText(getApplicationContext(), "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show();
+
+                return;
+            }
+
+            if (locationManager.getLastKnownLocation(bestProvider) != null) {
+                location = locationManager.getLastKnownLocation(bestProvider);
+                getAddressFromLocation();
+            } else {
+                locationManager.requestLocationUpdates(bestProvider, 1000, 1, locationListener);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getAddressFromLocation() {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        List<Address> address;
+
+        try {
+            address = geocoder.getFromLocation(this.location.getLatitude(), this.location.getLongitude(), 1);
+
+            if (address.size() > 0) {
+                Log.i("ADDRESS", address.get(0).getLocality());
+                Intent intent;
+                intent = new Intent(getApplicationContext(), BuscaActivity.class);
+                intent.putExtra(MainActivity.CITY_NAME, address.get(0).getLocality());
+
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (location.getAccuracy() <= 150) {
+                locationManager.removeUpdates(this);
+
+                getAddressFromLocation();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {}
+
+        @Override
+        public void onProviderEnabled(String s) {}
+
+        @Override
+        public void onProviderDisabled(String s) {}
+    };
+
     private AdapterView.OnItemClickListener cityClickListerner = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -121,77 +217,5 @@ public class MainActivity extends AppCompatActivity
 
             startActivity(intent);
         }
-    };
-
-    private View.OnClickListener gpsButtonClickListener = new View.OnClickListener() {
-        private LocationManager locationManager;
-        private Location location;
-
-        @Override
-        public void onClick(View view) {
-            updateLocation();
-        }
-
-        private void updateLocation() {
-            if ( Build.VERSION.SDK_INT >= 23 &&
-                    ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
-
-                return;
-            }
-
-            try {
-                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-                Criteria criteria = new Criteria();
-                String bestProvider = locationManager.getBestProvider(criteria, false);
-
-                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    Toast.makeText(getApplicationContext(), "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show();
-
-                    return;
-                }
-
-                if (locationManager.getLastKnownLocation(bestProvider) != null) {
-                    location = locationManager.getLastKnownLocation(bestProvider);
-                    startSearch();
-                } else {
-                    locationManager.requestLocationUpdates(bestProvider, 1000, 1, locationListener);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        private void startSearch() {
-            String latitude = String.format("%f", this.location.getLatitude());
-            String longitude = String.format("%f", this.location.getLongitude());
-
-            Intent intent;
-            intent = new Intent(getApplicationContext(), BuscaActivity.class);
-            intent.putExtra(MainActivity.CITY_LAT, latitude);
-            intent.putExtra(MainActivity.CITY_LON, longitude);
-
-            startActivity(intent);
-        }
-
-        private LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if (location.getAccuracy() <= 150) {
-                    locationManager.removeUpdates(this);
-
-                    startSearch();
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {}
-
-            @Override
-            public void onProviderEnabled(String s) {}
-
-            @Override
-            public void onProviderDisabled(String s) {}
-        };
     };
 }
