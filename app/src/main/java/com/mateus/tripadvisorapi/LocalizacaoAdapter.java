@@ -5,11 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -22,14 +24,30 @@ import java.util.ArrayList;
  * Created by Lucas on 19/11/2017.
  */
 
-public class LocalizacaoAdapter extends BaseAdapter{
+public class LocalizacaoAdapter extends BaseAdapter implements ListAdapter{
 
     private ArrayList<Localizacao> dataSet;
     private LayoutInflater layoutInflater;
+    private Bitmap[] imagesList;
+
+    private boolean SCROLL_STOP = true;
 
     public LocalizacaoAdapter(Context context , ArrayList objects) {
         dataSet = objects;
         layoutInflater = LayoutInflater.from(context);
+        imagesList = new Bitmap[dataSet.size()];
+
+        for (int i = 0; i < dataSet.size(); i++) {
+            imagesList[i] = null;
+        }
+    }
+
+    public boolean isSCROLL_STOP() {
+        return SCROLL_STOP;
+    }
+
+    public void setSCROLL_STOP(boolean SCROLL_STOP) {
+        this.SCROLL_STOP = SCROLL_STOP;
     }
 
     @Override
@@ -84,18 +102,36 @@ public class LocalizacaoAdapter extends BaseAdapter{
         viewHolder.value.setText(localizacao.getPrice());
         viewHolder.phone.setText(localizacao.getPhone());
 
-        if (viewHolder.image != null) {
-            new GetImageTask(viewHolder.image).execute(localizacao.getImg_url(), String.valueOf(position));
+        if (imagesList[position] != null) {
+            viewHolder.image.setImageBitmap(imagesList[position]);
+        } else {
+            Drawable defaultDrawable = viewHolder.image.getContext().getResources().getDrawable(R.drawable.ic_restaurant);
+            viewHolder.image.setImageDrawable(defaultDrawable);
         }
+
+        if (imagesList[position] == null && SCROLL_STOP) {
+            new GetImageTask(viewHolder.image, imagesList, position).execute(localizacao.getImg_url());
+        }
+
 
         return convertView;
     }
 
     private class GetImageTask extends AsyncTask<String, Void, Bitmap> {
-        private final WeakReference<ImageView> imageViewReference;
+        private final WeakReference<ImageView> imageViewWeakReference;
+        private final WeakReference<Bitmap[]> imageListReference;
+        private int position;
 
-        public GetImageTask(ImageView imageView) {
-            imageViewReference = new WeakReference<ImageView>(imageView);
+        public GetImageTask(ImageView imageView, Bitmap[] imageList, int pos) {
+            imageViewWeakReference = new WeakReference<ImageView>(imageView);
+            imageListReference = new WeakReference<Bitmap[]>(imageList);
+            position = pos;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.e("ASYNC", "CREATES ME");
         }
 
         @Override
@@ -116,15 +152,12 @@ public class LocalizacaoAdapter extends BaseAdapter{
 
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
-            ImageView imageView = imageViewReference.get();
+            ImageView imageView = imageViewWeakReference.get();
+            Bitmap[] imageList = imageListReference.get();
 
-            if (imageView != null) {
-                if (result != null) {
-                    imageView.setImageBitmap(result);
-                } else {
-                    Drawable defaultDrawable = imageView.getContext().getResources().getDrawable(R.drawable.ic_restaurant);
-                    imageView.setImageDrawable(defaultDrawable);
-                }
+            if (imageView != null && imageList != null && result != null) {
+                imageView.setImageBitmap(result);
+                imageList[position] = result;
             }
         }
     }

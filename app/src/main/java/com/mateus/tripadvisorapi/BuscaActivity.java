@@ -3,11 +3,13 @@ package com.mateus.tripadvisorapi;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -34,6 +36,7 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
 
     private LocalizacaoDAO localizacaoDAO;
     private ExecuteSearch executeSearch;
+    private Handler handler;
 
     //  Deslocamento do indice durante a busca
     private static int itemOffset = 0;
@@ -56,6 +59,8 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
 
         localizacaoDAO = new LocalizacaoDAO(this);
         localizacaoDAO.open();
+
+        handler = new Handler();
 
         listView = (ListView) findViewById(R.id.listViewBusca);
         statusTextView = (TextView)findViewById(R.id.statusTextViewBusca);
@@ -129,8 +134,9 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
 
     private void createListView() {
         itens = localizacaoDAO.getAllRestaurants(cityName);
+        final LocalizacaoAdapter adapter = new LocalizacaoAdapter(this, itens);
 
-        listView.setAdapter(new LocalizacaoAdapter(this, itens));
+        listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int pos, long l) {
@@ -142,9 +148,55 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
             }
         });
 
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                switch (scrollState) {
+                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                        adapter.setSCROLL_STOP(true);
+                        Log.i("SCROLL", "STOPED");
+                        handler.postDelayed(updateListView, 500);
+                        break;
+                    case AbsListView.OnScrollListener.SCROLL_STATE_FLING:
+                        adapter.setSCROLL_STOP(false);
+                        Log.i("SCROLL", "SCROLLING");
+                        handler.removeCallbacks(updateListView);
+                        break;
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int first, int vistibleCount, int totalItemCount) {
+
+            }
+        });
+
         progressBar.setVisibility(View.GONE);
         statusTextView.setVisibility(View.GONE);
     }
+
+    public Runnable updateListView = new Runnable() {
+        @Override
+        public void run() {
+            int first, last;
+
+            first = listView.getFirstVisiblePosition();
+            last = listView.getLastVisiblePosition();
+
+            Log.i("LOG", String.format("FIRST: %d, LAST: %d", first, last));
+
+            for (int i = first; i <= last; i++) {
+                final int dataPosition = i - listView.getHeaderViewsCount();
+                final int childPosition = i - listView.getFirstVisiblePosition();
+
+                if (dataPosition >= 0 && dataPosition < listView.getAdapter().getCount()
+                        && listView.getChildAt(childPosition) != null) {
+                    Log.i("REFRESH", "Refreshing view (data=" + dataPosition + ",child=" + childPosition + ")");
+                    listView.getAdapter().getView(i, listView.getChildAt(childPosition), listView);
+                }
+            }
+        }
+    };
 
     /**
      * Começa a baixar os dados de cada cidade.
@@ -201,8 +253,8 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
                 address3 = a.getString("address3");
 
                 address = address1;
-                address = address2.length() > 0 ? address.concat(" ").concat(address2) : address;
-                address = address3.length() > 0 ? address.concat(" ").concat(address3) : address;
+                address = (address2.length() > 0 && address2 != "null") ? address.concat(" ").concat(address2) : address;
+                address = (address3.length() > 0 && address3 != "null") ? address.concat(" ").concat(address3) : address;
 
                 city = a.getString("city");
 
