@@ -16,4 +16,6 @@
 
     <string name="API_KEY">L3PFu3mJdn9iUyiW1mVm36shVCZwdeQx8lyMme6xzMY-CltrFf-joJbj2nK55BRaWA5-tTlVV1jrzXU50vTkHiWaG5KMLBkFyccXsQy2MswrGllwck9_2s34MZUtWnYx</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_desenvolvedor_list">Créditos</string>
+    <string name="title_desenvolvedor_detail">Desenvolvedor Detail</string>
 </resources>

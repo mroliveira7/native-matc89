@@ -43,7 +43,7 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
     //  Valor máximo permitido pela API
     private static final int ITEM_OFFSET_INCREMENT = 50;
     //  Limite de resultados da API por cada busca
-    private static final int ITEM_OFFSET_LIMIT = 1000;
+    private static final int ITEM_OFFSET_LIMIT = 150;
     //  Caso tenha menos de 1000 itens
     private static int ITEM_OFFSET_MAX = 0;
 

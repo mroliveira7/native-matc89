@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity
 
             startActivity(intent);
         } else if (id == R.id.nav_creditos) {
-            intent = new Intent(this, CreditosActivity.class);
+            intent = new Intent(this, DesenvolvedorListActivity.class);
 
             startActivity(intent);
         }

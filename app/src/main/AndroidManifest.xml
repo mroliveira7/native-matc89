@@ -10,7 +10,6 @@
 
     <uses-feature android:name="android.hardware.location.gps" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,10 +19,10 @@
         android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,30 +31,43 @@
         </activity>
         <activity
             android:name=".FavoritosActivity"
-            android:label="@string/title_activity_favoritos"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:label="@string/title_activity_favoritos"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".HistoricoActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_historico"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".CreditosActivity"
-            android:label="@string/title_activity_creditos"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BuscaActivity"
-            android:label="@string/title_activity_busca"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:label="@string/title_activity_busca"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB4PdmvKuqwuB52UxJD9z3_4LIQ_evsQhY" />
 
         <activity android:name=".DetalhesActivity" />
+        <activity
+            android:name=".DesenvolvedorListActivity"
+            android:label="@string/title_desenvolvedor_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mateus.tripadvisorapi.MainActivity" />
+        </activity>
+        <activity
+            android:name=".DesenvolvedorDetailActivity"
+            android:label="@string/title_desenvolvedor_detail"
+            android:parentActivityName=".DesenvolvedorListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mateus.tripadvisorapi.DesenvolvedorListActivity" />
+        </activity>
     </application>
 
 </manifest>
