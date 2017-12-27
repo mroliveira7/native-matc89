@@ -2,6 +2,7 @@ package com.mateus.tripadvisorapi;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,12 +16,19 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class DetalhesActivity extends AppCompatActivity {
+public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCallback{
     private Localizacao localizacao;
 
     private TextView titulo;
@@ -32,6 +40,7 @@ public class DetalhesActivity extends AppCompatActivity {
 
     private FloatingActionButton favorito;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +48,10 @@ public class DetalhesActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.detailsMap);
+        mapFragment.getMapAsync((OnMapReadyCallback) this);
 
         Bundle extras = getIntent().getExtras();
 
@@ -82,6 +95,18 @@ public class DetalhesActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        LatLng coordenadas = new LatLng(localizacao.getLat(), localizacao.getLon());
+        map.addMarker(new MarkerOptions()
+                .position(coordenadas)
+                .title("Marker"));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordenadas, 15));
+        map.animateCamera(CameraUpdateFactory.zoomIn());
+        map.animateCamera(CameraUpdateFactory.zoomTo(15) , 2000, null);
+    }
+
 
     private View.OnClickListener favoritarListener = new View.OnClickListener() {
         @Override
