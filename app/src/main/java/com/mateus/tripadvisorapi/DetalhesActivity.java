@@ -2,7 +2,6 @@ package com.mateus.tripadvisorapi;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -105,6 +104,7 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordenadas, 15));
         map.animateCamera(CameraUpdateFactory.zoomIn());
         map.animateCamera(CameraUpdateFactory.zoomTo(15) , 2000, null);
+        map.getUiSettings().setScrollGesturesEnabled(false);
     }
 
 
