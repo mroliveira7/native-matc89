@@ -134,6 +134,14 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
 
     private void createListView() {
         itens = localizacaoDAO.getAllRestaurants(cityName);
+
+        if (itens.size() == 0) {
+            progressBar.setVisibility(View.GONE);
+            statusTextView.setText("Não foi encontrado nenhum estabelecimento nesta cidade :(");
+
+            return;
+        }
+
         final LocalizacaoAdapter adapter = new LocalizacaoAdapter(this, itens);
 
         listView.setAdapter(adapter);
@@ -209,8 +217,6 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
     private void startSearch () {
         String offset = String.format("%d", itemOffset);
         String increment = String.format("%d", ITEM_OFFSET_INCREMENT);
-        Log.i("LOG", String.format("ITEM OFFSET MAX %d",ITEM_OFFSET_MAX));
-        Log.i("LOG", String.format("ITEM OFFSET %d",itemOffset));
 
         if (ITEM_OFFSET_MAX != 0 && (itemOffset + ITEM_OFFSET_INCREMENT) > ITEM_OFFSET_MAX || (itemOffset + ITEM_OFFSET_INCREMENT) > ITEM_OFFSET_LIMIT) {
             createListView();
@@ -261,6 +267,9 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
                 address = (address3.length() > 0 && address3 != "null") ? address.concat(" ").concat(address3) : address;
 
                 city = a.getString("city");
+                if (!city.equals(cityName)) {
+                    continue;
+                }
 
                 JSONObject l = obj.getJSONObject("coordinates");
                 lat = BigDecimal.valueOf(l.getDouble("latitude")).floatValue();

@@ -49,7 +49,24 @@ public class DummyContent {
     private static String makeDetails(String name, int position) {
         StringBuilder builder = new StringBuilder();
         //builder.append("Details about "+name+": ").append(position);
-            builder.append("\nAluno de Ciência da Computação na UFBA");
+        //DESCRICAO GERAL
+        builder.append("\nAluno de Ciência da Computação na Unversidade Federal da Bahia");
+            if (name == "Alan"){
+                //DESCRICAO ALAN
+                //builder.append("\nAluno de Ciência da Computação na Unversidade Federal da Bahia");
+            }
+            else if (name == "Lucas"){
+                //DESCRICAO Lucas
+                // builder.append("\nAluno de Ciência da Computação na Unversidade Federal da Bahia");
+            }
+            else if (name == "Marcos"){
+                //DESCRICAO MARCOS
+                //builder.append("\nAluno de Ciência da Computação na Unversidade Federal da Bahia");
+            }
+            else if (name == "Mateus"){
+                //DESCRICAO MATEUS
+                //builder.append("\nAluno de Ciência da Computação na Unversidade Federal da Bahia");
+            }
         return builder.toString();
     }
 
