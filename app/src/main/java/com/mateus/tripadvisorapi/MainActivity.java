@@ -1,5 +1,6 @@
 package com.mateus.tripadvisorapi;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -10,7 +11,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,12 +21,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -31,7 +36,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     private Button gpsButton;
     private AutoCompleteTextView autocomplete;
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private Location location;
 
     public static final String CITY_NAME = "CITY_NAME";
+    public static final int LOCATION_PERMISSION = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +144,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateLocation() {
         if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION);
 
             return;
         }
@@ -154,6 +162,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             if (locationManager.getLastKnownLocation(bestProvider) != null) {
+                Log.i("LOCATION", "KNOWN LOCATION");
                 location = locationManager.getLastKnownLocation(bestProvider);
                 getAddressFromLocation();
             } else {
@@ -161,6 +170,27 @@ public class MainActivity extends AppCompatActivity
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case LOCATION_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    updateLocation();
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Por favor, autorize o acesso a localização.", Toast.LENGTH_SHORT);
+                    TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+
+                    if( v != null) {
+                        v.setGravity(Gravity.CENTER);
+                    }
+
+                    toast.show();
+                }
         }
     }
 

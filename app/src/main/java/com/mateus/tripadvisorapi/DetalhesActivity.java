@@ -8,8 +8,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -20,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -27,7 +31,8 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, Animation.AnimationListener{
     private Localizacao localizacao;
 
     private TextView titulo;
@@ -36,9 +41,12 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
     private RatingBar ratingBar;
     private TextView price;
     private TextView phone;
+    private SupportMapFragment mapFragment;
 
     private FloatingActionButton favorito;
 
+    private TranslateAnimation moveLefttoRight;
+    private TranslateAnimation moveRighttoLeft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +56,18 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.detailsMap);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.detailsMap);
         mapFragment.getMapAsync((OnMapReadyCallback) this);
+
+        moveLefttoRight = new TranslateAnimation(0, 400, 0, 0);
+        moveLefttoRight.setDuration(250);
+        moveLefttoRight.setFillAfter(true);
+        moveLefttoRight.setAnimationListener(this);
+
+        moveRighttoLeft = new TranslateAnimation(400, 0, 0, 0);
+        moveRighttoLeft.setDuration(250);
+        moveRighttoLeft.setFillAfter(true);
+        moveRighttoLeft.setAnimationListener(this);
 
         Bundle extras = getIntent().getExtras();
 
@@ -75,7 +92,6 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
             new GetImageTask(image).execute(localizacao.getImg_url());
         }
 
-
         favorito = (FloatingActionButton) findViewById(R.id.favoritoButton);
         favorito.setOnClickListener(favoritarListener);
 
@@ -98,13 +114,17 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap map) {
         LatLng coordenadas = new LatLng(localizacao.getLat(), localizacao.getLon());
-        map.addMarker(new MarkerOptions()
+
+        Marker marker = map.addMarker(new MarkerOptions()
                 .position(coordenadas)
-                .title("Marker"));
+                .title(localizacao.getTitle()));
+
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordenadas, 15));
         map.animateCamera(CameraUpdateFactory.zoomIn());
         map.animateCamera(CameraUpdateFactory.zoomTo(15) , 2000, null);
-        map.getUiSettings().setScrollGesturesEnabled(false);
+        map.getUiSettings().setAllGesturesEnabled(false);
+        map.setOnMarkerClickListener(this);
+        map.setOnMapClickListener(this);
     }
 
 
@@ -114,6 +134,44 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
             Toast.makeText(getApplicationContext(), "Adicionado aos favoritos", Toast.LENGTH_SHORT).show();
         }
     };
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (favorito.getVisibility() == View.VISIBLE) {
+            favorito.startAnimation(moveLefttoRight);
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        if (favorito.getVisibility() == View.GONE) {
+            favorito.setVisibility(View.VISIBLE);
+            favorito.startAnimation(moveRighttoLeft);
+        }
+    }
+
+    @Override
+    public void onAnimationStart(Animation animation) {
+        if (animation == moveRighttoLeft) {
+            favorito.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animation animation) {
+        if (animation == moveLefttoRight) {
+            favorito.setVisibility(View.GONE);
+        }
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation) {
+
+    }
 
     private class GetImageTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewReference;
