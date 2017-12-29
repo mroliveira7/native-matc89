@@ -73,7 +73,6 @@ public class DesenvolvedorDetailActivity extends AppCompatActivity {
         if (extras != null) {
             urlImg = extras.getString("url");
         }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         new DownloadTask().execute();
 
