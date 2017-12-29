@@ -148,10 +148,11 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int pos, long l) {
+                localizacaoDAO.open();
                 Localizacao local = itens.get(pos);
+                long id = localizacaoDAO.insertHistorico(local.getId_location());
                 Intent intent = new Intent(BuscaActivity.this, DetalhesActivity.class);
                 intent.putExtra("LOCAL", local);
-
                 startActivity(intent);
             }
         });

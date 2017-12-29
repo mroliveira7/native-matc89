@@ -64,6 +64,7 @@ public class Localizacao implements Parcelable {
         }
     };
 
+
     public String getId_location() {
         return id_location;
     }

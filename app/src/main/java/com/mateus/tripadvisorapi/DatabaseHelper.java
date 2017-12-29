@@ -14,6 +14,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_RESTAURANT = "restaurant";
     public static final String TABLE_FAVORITOS = "favoritos";
     public static final String TABLE_RESTAURANT_ID = "restaurant_id";
+    public static final String TABLE_HISTORICO = "historico";
+
 
 
     public static final String COLUMN_ID_LOCATION = "id_location";
@@ -27,6 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_IMG_URL = "img_url";
     public static final String COLUMN_URL = "url";
+    public static final String COLUMN_DATE_TIME = "date";
 
     public DatabaseHelper(Context context) {
         super(context, "banco.db", null, version);
@@ -57,6 +60,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_PRICE        + " TEXT," +
                 COLUMN_PHONE        + " TEXT,"+
                 COLUMN_IMG_URL      + " TEXT);"
+        );
+
+        db.execSQL("CREATE TABLE " + TABLE_HISTORICO + "(" +
+                "_id            INTEGER     PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_ID_LOCATION  + " TEXT        UNIQUE," +
+                COLUMN_DATE_TIME + " DATETIME);"
         );
 
         db.execSQL("CREATE TABLE " + TABLE_RESTAURANT_ID + "(" +

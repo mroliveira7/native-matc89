@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by mateus on 22/12/17.
@@ -18,7 +20,7 @@ public class LocalizacaoDAO {
     private String[] allColumns = {DatabaseHelper.COLUMN_ID_LOCATION, DatabaseHelper.COLUMN_TITLE,
             DatabaseHelper.COLUMN_ADDRESS, DatabaseHelper.COLUMN_CITY, DatabaseHelper.COLUMN_LAT,
             DatabaseHelper.COLUMN_LON, DatabaseHelper.COLUMN_RATING, DatabaseHelper.COLUMN_PRICE,
-            DatabaseHelper.COLUMN_PHONE, DatabaseHelper.COLUMN_IMG_URL, DatabaseHelper.COLUMN_URL};
+            DatabaseHelper.COLUMN_PHONE, DatabaseHelper.COLUMN_IMG_URL, DatabaseHelper.COLUMN_URL, DatabaseHelper.COLUMN_DATE_TIME};
 
     public LocalizacaoDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
@@ -102,6 +104,41 @@ public class LocalizacaoDAO {
 
         result = db.insert(DatabaseHelper.TABLE_RESTAURANT_ID, null, cv);
         return result;
+    }
+
+    public long  insertHistorico(String id_favorito) {
+        Log.d("teste", "id é  " + id_favorito);
+
+        long result;
+        Date currentTime = Calendar.getInstance().getTime();
+        String time = currentTime.toString();
+        Log.d("text", time);
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.COLUMN_ID_LOCATION, id_favorito);
+        cv.put(DatabaseHelper.COLUMN_DATE_TIME, time);
+
+        result = db.insert(DatabaseHelper.TABLE_HISTORICO, null, cv);
+        return result;
+    }
+
+    public ArrayList<Localizacao> getAllRestaurantsByHistorico() {
+        ArrayList<Localizacao> localizacoes = new ArrayList<Localizacao>();
+        String query = "SELECT res.id_location, title, address, city, lat, lon, rating, price, phone, img_url, url, res_id.date FROM " + DatabaseHelper.TABLE_RESTAURANT + " as res " +
+                "INNER JOIN " + DatabaseHelper.TABLE_HISTORICO + " as res_id " +
+                "ON res.id_location = res_id.id_location " +
+                "ORDER BY " + DatabaseHelper.COLUMN_DATE_TIME + " DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Localizacao localizacao = cursorToLocalizacao(cursor);
+            localizacoes.add(localizacao);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        return localizacoes;
     }
 
     public boolean databaseHasCity(String city) {
