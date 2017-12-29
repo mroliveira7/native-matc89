@@ -1,5 +1,6 @@
 package com.mateus.tripadvisorapi;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -7,5 +8,5 @@ import org.json.JSONObject;
  */
 
 public interface AsyncResponse {
-    public void processFinish(JSONObject response);
+    public void processFinish(JSONObject response) throws JSONException;
 }

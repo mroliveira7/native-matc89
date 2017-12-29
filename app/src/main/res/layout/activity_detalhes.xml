@@ -110,7 +110,8 @@
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDetalhesEndereco" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewDetalhesEndereco"
+        android:layout_marginLeft="8dp" />
 
 
     <TextView
@@ -135,7 +136,8 @@
         android:text="Phone"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDetalhesTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewDetalhesTitle"
+        android:layout_marginRight="8dp" />
 
     <fragment
         android:id="@+id/detailsMap"
@@ -158,7 +160,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="8dp">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/favoritoButton"
@@ -167,7 +170,8 @@
             android:layout_gravity="bottom|right"
             android:layout_margin="@dimen/fab_margin"
             app:backgroundTint="@color/colorPrimary"
-            app:srcCompat="@drawable/ic_menu_favorite_light" />
+            app:srcCompat="@drawable/ic_menu_favorite_light"
+            tools:ignore="VectorDrawableCompat" />
     </android.support.design.widget.CoordinatorLayout>
 
 </android.support.constraint.ConstraintLayout>

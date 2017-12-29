@@ -232,13 +232,13 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
      * @param response
      */
     @Override
-    public void processFinish(JSONObject response) {
+    public void processFinish(JSONObject response) throws JSONException {
 
 
         String id, title, address, address1, address2, address3, city, price, phone, img_url, url;
         float lat, lon, rating;
         Localizacao loc;
-
+        
         try {
             ITEM_OFFSET_MAX = response.has("total") ? response.getInt("total") : null;
             ITEM_OFFSET_MAX = ITEM_OFFSET_MAX > ITEM_OFFSET_LIMIT ? ITEM_OFFSET_LIMIT : ITEM_OFFSET_MAX;
@@ -275,6 +275,7 @@ public class BuscaActivity extends AppCompatActivity implements AsyncResponse {
                 loc = new Localizacao(id, title, address, city, lat, lon, rating, price, phone, img_url, url);
                 new InsertRow().execute(loc);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
