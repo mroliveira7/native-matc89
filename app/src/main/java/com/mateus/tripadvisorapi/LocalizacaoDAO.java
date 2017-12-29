@@ -73,6 +73,37 @@ public class LocalizacaoDAO {
         return localizacoes;
     }
 
+    public ArrayList<Localizacao> getAllRestaurantsByFavoritos() {
+        ArrayList<Localizacao> localizacoes = new ArrayList<Localizacao>();
+        String query = "SELECT res.id_location, title, address, city, lat, lon, rating, price, phone, img_url, url FROM " + DatabaseHelper.TABLE_RESTAURANT + " as res " +
+                "INNER JOIN " + DatabaseHelper.TABLE_RESTAURANT_ID + " as res_id " +
+                "ON res.id_location = res_id.id_location " +
+                "ORDER BY " + DatabaseHelper.COLUMN_TITLE;
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Localizacao localizacao = cursorToLocalizacao(cursor);
+            localizacoes.add(localizacao);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        return localizacoes;
+    }
+
+    public long  insertId(String id_favorito) {
+        Log.d("teste", "id é  " + id_favorito);
+
+        long result;
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.COLUMN_ID_LOCATION, id_favorito);
+
+        result = db.insert(DatabaseHelper.TABLE_RESTAURANT_ID, null, cv);
+        return result;
+    }
+
     public boolean databaseHasCity(String city) {
         String query = "SELECT " + DatabaseHelper.COLUMN_CITY +
                 " FROM " + DatabaseHelper.TABLE_RESTAURANT +
@@ -87,6 +118,27 @@ public class LocalizacaoDAO {
         } else {
             return true;
         }
+    }
+
+    public boolean localizacaoIsFavorito(String id_location) {
+        String query = "SELECT * " +
+                " FROM " + DatabaseHelper.TABLE_RESTAURANT_ID +
+                " WHERE " + DatabaseHelper.COLUMN_ID_LOCATION + " = '" + id_location + "'" +
+                " LIMIT 1;";
+
+        Cursor cursor = db.rawQuery(query,null);
+
+        Log.i("COUNT", Integer.toString(cursor.getCount()));
+        if (cursor.getCount() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public long removeId(String id_location) {
+        long result = db.delete(DatabaseHelper.TABLE_RESTAURANT_ID, DatabaseHelper.COLUMN_ID_LOCATION + " = " + "'" + id_location + "'", null);
+        return result;
     }
 
     private Localizacao cursorToLocalizacao (Cursor cursor) {

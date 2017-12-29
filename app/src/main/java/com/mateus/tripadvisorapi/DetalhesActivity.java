@@ -1,9 +1,12 @@
 package com.mateus.tripadvisorapi;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +38,8 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
         GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, Animation.AnimationListener{
     private Localizacao localizacao;
 
+    LocalizacaoDAO localizacaoDAO;
+
     private TextView titulo;
     private TextView endereco;
     private ImageView image;
@@ -47,6 +52,7 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
 
     private TranslateAnimation moveLefttoRight;
     private TranslateAnimation moveRighttoLeft;
+    Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +94,9 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
             ratingBar.setRating(localizacao.getRating());
             price.setText(localizacao.getPrice());
             phone.setText(localizacao.getPhone());
+
+            localizacaoDAO = new LocalizacaoDAO(this);
+            localizacaoDAO.open();
 
             new GetImageTask(image).execute(localizacao.getImg_url());
         }
@@ -131,7 +140,23 @@ public class DetalhesActivity extends AppCompatActivity implements OnMapReadyCal
     private View.OnClickListener favoritarListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Toast.makeText(getApplicationContext(), "Adicionado aos favoritos", Toast.LENGTH_SHORT).show();
+            SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = prefs.edit();
+
+            String id_location = localizacao.getId_location();
+
+            editor.putString("favorito", id_location);
+            editor.commit();
+            boolean isFavorito = localizacaoDAO.localizacaoIsFavorito(id_location);
+            if (isFavorito){
+                long id = localizacaoDAO.removeId(id_location);
+                Toast.makeText(getApplicationContext(), "Removido dos favoritos", Toast.LENGTH_SHORT).show();
+            }else{
+                long id = localizacaoDAO.insertId(id_location);
+                Toast.makeText(getApplicationContext(), "Adicionado aos favoritos", Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 
